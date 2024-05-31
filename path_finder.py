@@ -11,10 +11,10 @@ def get_successors(point, grid):
     list_successors = []
     rows = len(grid)
     cols = len(grid[0])
-    offsets = [(-1, 0), (1, 0), (0, -1), (0, 1), (1, 1), (-1, -1), (1, -1), (-1, 1)]  # Up, Down, Left, Right
+    offsets = [(-1, 0), (1, 0), (0, -1), (0, 1), (1, 1), (-1, -1), (1, -1), (-1, 1)]  # Up, Down, Left, Right and diagonals
     for dx, dy in offsets:
         successor = (point[0] + dx, point[1] + dy)
-        if 0 <= successor[0] < rows and 0 <= successor[1] < cols and grid[successor[0]][successor[1]] != -1:
+        if 0 <= successor[0] < rows and 0 <= successor[1] < cols and grid[successor[0]][successor[1]] != -1: #eliminated the part that is not in the grid and the obstacles
             list_successors.append(successor)
     return list_successors
 
@@ -72,7 +72,7 @@ def path_maker(grid):
 
     
     # A* to get to the first victim
-    print(obstacle)
+    #print(obstacle)
     path = astar(grid, start[0], victims[0])
     path_total.extend(path)
     
@@ -92,12 +92,25 @@ def path_maker(grid):
 
 
 if __name__ == "__main__":
-    grid = [
-    [3, 0, 0, 0, 2],
-    [0, -1, 0, -1, 0],
-    [0, -1, 1, -1, 0],
-    [0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0]]
+    grid = [[0 for _ in range(6)] for _ in range(8)]
+    grid[0][0] = 3  # Start
+    grid[0][1] = 2  # base
+
+    #victimins
+    grid[3][1] = 1
+    grid[4][5] = 1
+    grid[7][5] = 1
+
+    #obstacles
+    #grid[2][1] = -1
+    #grid[2][2] = -1
+    #grid[3][3] = -1
+    #grid[5][2] = -1
+    def print_grid(grid):
+        for row in grid:
+            print(" ".join(str(cell) for cell in row))
+
+    print_grid(grid)
 
     path = path_maker(grid)
     print("Caminho A*:", path)
