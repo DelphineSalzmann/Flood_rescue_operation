@@ -44,8 +44,8 @@ robotDynamics = 'unicycle'    # use 'signleIntegrator2D' or 'unicycle'
 
 # ... initial positions defined from d
 # ata    (dimension: nb of agents  x  2)
-initPositions = np.array([[ 0, 3, 4, 7],       # x-coordinates (m)
-                          [0, 1, 5, 5]]).T   # y-coordinates (m)
+initPositions = np.array([[ 0, 1, -1, 2],       # x-coordinates (m)
+                          [0, 1, 1, 0]]).T   # y-coordinates (m)
 
 
 # ... initial orientation angles and poses (USED FOR UNICYCLE DYNAMICS ONLY)

@@ -62,6 +62,7 @@ from . import path_finder as pf
 # use keyword "global" inside a function if the variable needs to be modified by the function
 
 global trajectory
+global trajectory_done
 global index_trajectory
 global Victim
 global Entry_circle
@@ -69,6 +70,7 @@ global Exit_circle
 global index_leader
 
 index_leader = 0
+trajectory_done = False
 
 Victim = [True, False, False, False]
 index_trajectory = 0
@@ -77,16 +79,15 @@ grid[0][0] = 3  # Start
 grid[0][1] = 2  # base
 
 #victimins
-grid[1][0] = 1
-grid[2][1] = 1
-grid[2][3] = 1
+#grid[1][0] = 1
+#grid[2][1] = 1
+#grid[2][3] = 1
 
 #obstacles
 #grid[2][1] = -1
 #grid[2][2] = -1
 #grid[3][3] = -1
 #grid[5][2] = -1
-trajectory = pf.path_maker(grid)
 Entry_circle = [True, False, False, False]
 Exit_circle = [True, False, False, False]
 

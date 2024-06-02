@@ -2,10 +2,59 @@
 #implementação de Astar e wavefront expansion para ver qual é o melhor
 
 from queue import PriorityQueue
-
+from matplotlib import pyplot as plt
+from matplotlib.animation import FuncAnimation
+import numpy as np
 
 def manhattan_heuristic(xy1, xy2):
     return abs(xy1[0]-xy2[0]) + abs(xy1[1]- xy2[1])
+#function able to build the grid with the correct mapping coverting real to the grid
+def build_grid(poses, base, obstacles = []):
+    x_min, x_max = -2.0, 2.0
+    y_min, y_max = -4.0, 4.0
+
+    resolution = 0.2
+    
+    x_size = int((x_max - x_min) / resolution)+1
+    y_size = int((y_max - y_min) / resolution)+1
+    grid = np.zeros((y_size, x_size))
+
+    for i, pose in enumerate(poses):
+        y_idx, x_idx = real_to_grid(pose[0], pose[1])
+        if i == 0:
+            grid[y_idx, x_idx] = 3  # start
+        else:
+            grid[y_idx, x_idx] = 1  # victmin
+    for obstacle in obstacles:
+        y_idx, x_idx = real_to_grid(obstacle[0], obstacle[1])
+        grid[y_idx, x_idx] = -1 # obstacles
+        sucessors = get_successors((y_idx, x_idx), grid)
+        for sucessor in sucessors:
+            if sucessor[1] < y_size and sucessor[0] < x_size:
+                print('sucessor', sucessor)
+                y_id, x_id = real_to_grid(sucessor[0], sucessor[1])
+                grid[y_id, x_id] = -1 # obstacles
+
+
+    y_idx, x_idx = real_to_grid(base[0], base[1])
+    grid[y_idx, x_idx] = 2 #base
+    return grid
+    # place the firefighter and the victmins in the grid
+
+# aux function to turn the number in the grid
+def real_to_grid(x, y, x_min =-2.0, y_min = -4.0, resolution = 0.2):
+    resolution = 0.2
+    x_idx = int((x - x_min) / resolution)
+    y_idx = int((y - y_min) / resolution)
+    return y_idx, x_idx
+#aux invert
+def grid_to_real(points, x_min=-2.0, y_min=-4.0, resolution=0.2):
+    transformed_points = []
+    for y_idx, x_idx in points:
+        x = x_idx * resolution + x_min
+        y = y_idx * resolution + y_min
+        transformed_points.append((x, y))
+    return transformed_points
 
 def get_successors(point, grid):
     list_successors = []
@@ -73,6 +122,7 @@ def path_maker(grid):
     
     # A* to get to the first victim
     #print(obstacle)
+    print(start, victims, base, obstacle)
     path = astar(grid, start[0], victims[0])
     path_total.extend(path)
     
@@ -87,30 +137,47 @@ def path_maker(grid):
     
     return path_total
 
-    
+#not supose to be use outside this script
+def plot_grid(grid, path= None):
+    colors = {0: 'white', -1: 'black', 1: 'red', 2: 'blue', 3: 'green'}
+    colored_grid = np.zeros(grid.shape + (3,), dtype=np.uint8)
+
+    for r in range(grid.shape[0]):
+        for c in range(grid.shape[1]):
+            color = colors[grid[r, c]]
+            colored_grid[r, c] = np.array(plt.cm.colors.to_rgba(color)[:3]) * 255
+
+    plt.imshow(colored_grid)
+    plt.title('Grid with start (blue), victims (red)and base (green). Path is yellow')
+    if path:
+        path_x, path_y = zip(*path)
+        plt.plot(path_y, path_x, color='yellow')  # Plotting the path in yellow
+    def update(frame):
+        if frame < len(path):
+            # Plot the path up to the current frame
+            path_x, path_y = zip(*path[:frame+1])
+            plt.plot(path_y, path_x, color='yellow')
+            plt.scatter(path_y[-1], path_x[-1], color='red')  # Highlight the current position with a red dot
+        else:
+            # If all frames have been shown, plot the entire path
+            path_x, path_y = zip(*path)
+            plt.plot(path_y, path_x, color='yellow')
+        plt.xlabel('Y')
+        plt.ylabel('X')
+        plt.title('Animated Path')     
+    fig = plt.gcf()
+    ani = FuncAnimation(fig, update, frames=len(path)+1, interval=100, repeat=False) 
+    plt.show()
 
 
 
 if __name__ == "__main__":
-    grid = [[0 for _ in range(6)] for _ in range(8)]
-    grid[0][0] = 3  # Start
-    grid[0][1] = 2  # base
-
-    #victimins
-    grid[3][1] = 1
-    grid[4][5] = 1
-    grid[7][5] = 1
-
-    #obstacles
-    #grid[2][1] = -1
-    #grid[2][2] = -1
-    #grid[3][3] = -1
-    #grid[5][2] = -1
-    def print_grid(grid):
-        for row in grid:
-            print(" ".join(str(cell) for cell in row))
-
-    print_grid(grid)
+    grid = build_grid([(0,0), (-1, 0.4), (-0.4, -1), (2, 0,4)], (0,0.2), [(1,1)])
+    #plot_grid(grid)
 
     path = path_maker(grid)
-    print("Caminho A*:", path)
+    print(path)
+    plot_grid(grid, path)
+
+    path = grid_to_real(path)
+    print(path)

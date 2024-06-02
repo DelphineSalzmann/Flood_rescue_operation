@@ -41,27 +41,14 @@ global Victim
 Victim = [True, False, False, False]
 index_trajectory = 0
 index_victim = 1
-grid = [[0 for _ in range(7)] for _ in range(9)]
-grid[0][0] = 3  # Start
-grid[0][1] = 2  # base
 
-#victimins
-grid[3][1] = 1
-grid[4][5] = 1
-grid[7][5] = 1
-
-#obstacles
-#grid[2][1] = -1
-#grid[2][2] = -1
-#grid[3][3] = -1
-#grid[5][2] = -1
 
 
 
 # =============================================================================
 
-global trajectory_make 
-
+global trajectory_done
+trajectory_done = False
 
 # =============================================================================
 def formation(t, robotNo, robots_poses):
@@ -71,6 +58,7 @@ def formation(t, robotNo, robots_poses):
     global Victim
     global trajectory
     global index_trajectory
+    global trajectory_done
     
     # number of robots (short notation)
     N = robots_poses.shape[0]
@@ -89,7 +77,12 @@ def formation(t, robotNo, robots_poses):
 
     # adjacency matrix of communication graph
     # -----------------------------------------
-    trajectory = pf.path_maker(grid, robots_poses)
+    if trajectory_done == False:
+        grid = pf.build_grid(robots_poses, (0,0.2), [(1,1)])
+        path = pf.path_maker(grid)
+        trajectory = pf.grid_to_real(path)
+        trajectory_done = True
+        print('fiz a tragetoria só uma vez')
     A = np.ones((N, N)) - np.eye(N)
   
     if firstCall:  # print information (only once)
