@@ -115,7 +115,9 @@ def tb3_control_fn(robotNo, tb3_poses, cf_poses, rmtt_poses, rms1_poses, obstacl
     k_leader = 0.2
     k_follower = 0.3
     if trajectory_done == False:
-        grid = pf.build_grid(tb3_poses, (0,0.2), [(1,1)])
+        print(tb3_poses)
+        robot_poses = [(tb3_poses[0, i], tb3_poses[1, i]) for i in range(nbTB3)]
+        grid = pf.build_grid(robot_poses, (0,0.2), [(1,1)])
         path = pf.path_maker(grid)
         trajectory = pf.grid_to_real(path)
         trajectory_done = True

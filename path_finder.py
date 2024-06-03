@@ -173,7 +173,7 @@ def plot_grid(grid, path= None):
 
 if __name__ == "__main__":
     grid = build_grid([(0,0), (-1, 0.4), (-0.4, -1), (2, 0,4)], (0,0.2), [(1,1)])
-    #plot_grid(grid)
+    plot_grid(grid)
 
     path = path_maker(grid)
     print(path)
